@@ -2,9 +2,9 @@ const path = require("path");
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const errorController = require("./controllers/error");
-const mongoose = require("mongoose");
 const User = require("./models/user");
 
 const app = express();
@@ -14,6 +14,7 @@ app.set("views", "views");
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
@@ -36,24 +38,22 @@ mongoose
   .connect(
     "mongodb+srv://arhamfaisal780:Arham123.@cluster0.rzdbkky.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0"
   )
-  .then((res) => {
-    User.findOne()
-      .then((user) => {
-        if (!user) {
-          const newUser = new User({
-            name: "Arham",
-            email: "arhamfaisal780@gmail.com",
-            cart: {
-              items: [],
-            },
-          });
-          newUser.save();
-        }
-        app.listen(3000);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    console.log(res, "connected");
+  .then((result) => {
+    console.log(result, "connected");
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "Arham",
+          email: "arhamfaisal780@gmail.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
+    app.listen(3000);
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.log(err);
+  });
