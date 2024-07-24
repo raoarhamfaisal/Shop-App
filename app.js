@@ -7,8 +7,15 @@ const mongoose = require("mongoose");
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+const MONGODB_URI =
+  "mongodb+srv://arhamfaisal780:Arham123.@cluster0.rzdbkky.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
 
 const app = express();
+var store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: "sessions",
+});
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -24,6 +31,7 @@ app.use(
     secret: "my secret",
     resave: false,
     saveUninitialized: false,
+    store: store,
   })
 );
 
@@ -43,9 +51,7 @@ app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
-  .connect(
-    "mongodb+srv://arhamfaisal780:Arham123.@cluster0.rzdbkky.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0"
-  )
+  .connect(MONGODB_URI)
   .then((result) => {
     console.log(result, "connected");
     User.findOne().then((user) => {
