@@ -7,12 +7,12 @@ const nodemailer = require("nodemailer");
 
 // Create a transporter object
 const transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
+  host: "smtp.mailgun.org",
   port: 587,
   secure: false, // use SSL
   auth: {
-    user: "4058f82ed54e54",
-    pass: "294688f0eba5c2",
+    user: "postmaster@sandbox47f9dfd304b14b309e31c62fecc2e8da.mailgun.org",
+    pass: "f607ce053740b452dd5acb64e315d7f3-0f1db83d-e4ba420f",
   },
 });
 
@@ -95,7 +95,7 @@ exports.postSignup = (req, res, next) => {
             to: email,
             subject: "Successfully Signed Up",
             text: "You are signed up to arhamfaisal",
-            // html: "<h1>Successfully Signed Up</h1>",
+            html: "<h1>Successfully Signed Up</h1>",
           };
 
           transporter.sendMail(mailOptions, function (error, info) {
