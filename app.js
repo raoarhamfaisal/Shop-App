@@ -58,18 +58,6 @@ mongoose
   .connect(MONGODB_URI)
   .then((result) => {
     console.log(result, "connected");
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "Arham",
-          email: "arhamfaisal780@gmail.com",
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
     app.listen(3000);
   })
   .catch((err) => {
