@@ -7,12 +7,12 @@ const nodemailer = require("nodemailer");
 
 // Create a transporter object
 const transporter = nodemailer.createTransport({
-  host: "smtp.mailgun.org",
+  host: process.env.MAILERSEND_HOST,
   port: 587,
-  secure: false, // use SSL
+  secure: false,
   auth: {
-    user: "postmaster@sandbox47f9dfd304b14b309e31c62fecc2e8da.mailgun.org",
-    pass: "f607ce053740b452dd5acb64e315d7f3-0f1db83d-e4ba420f",
+    user: process.env.MAILERSEND_USER,
+    pass: process.env.MAILERSEND_PASS,
   },
 });
 
@@ -33,9 +33,16 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.getSignup = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
+    errorMessage: message,
   });
 };
 
@@ -81,30 +88,31 @@ exports.postSignup = (req, res, next) => {
       return bcrypt
         .hash(password, 12)
         .then((hashedPassword) => {
-          const user = new User({
-            email: email,
-            password: hashedPassword,
-            cart: { items: [] },
+          const mailOptions = {
+            from: "arhamfaisal780@gmail.com",
+            to: email,
+            subject: "Successfully Signed Up",
+            text: "You are signed up to arhamfaisal",
+            html: "<h1>Successfully Signed Up</h1>",
+          };
+
+          return transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log("Error:", error);
+            } else {
+              console.log("Email sent:", info.response);
+              const user = new User({
+                email: email,
+                password: hashedPassword,
+                cart: { items: [] },
+              });
+              return user.save();
+            }
           });
-          return user.save();
         })
         .then((result) => {
-          // // Configure the mailoptions object
-          // const mailOptions = {
-          //   from: "arhamfaisal780@gmail.com",
-          //   to: email,
-          //   subject: "Successfully Signed Up",
-          //   text: "You are signed up to arhamfaisal",
-          //   html: "<h1>Successfully Signed Up</h1>",
-          // };
+          // Configure the mailoptions object
 
-          // transporter.sendMail(mailOptions, function (error, info) {
-          //   if (error) {
-          //     console.log("Error:", error);
-          //   } else {
-          //     console.log("Email sent:", info.response);
-          //   }
-          // });
           res.redirect("/login");
         });
     })
