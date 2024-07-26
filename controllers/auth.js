@@ -89,22 +89,22 @@ exports.postSignup = (req, res, next) => {
           return user.save();
         })
         .then((result) => {
-          // Configure the mailoptions object
-          const mailOptions = {
-            from: "arhamfaisal780@gmail.com",
-            to: email,
-            subject: "Successfully Signed Up",
-            text: "You are signed up to arhamfaisal",
-            html: "<h1>Successfully Signed Up</h1>",
-          };
+          // // Configure the mailoptions object
+          // const mailOptions = {
+          //   from: "arhamfaisal780@gmail.com",
+          //   to: email,
+          //   subject: "Successfully Signed Up",
+          //   text: "You are signed up to arhamfaisal",
+          //   html: "<h1>Successfully Signed Up</h1>",
+          // };
 
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log("Error:", error);
-            } else {
-              console.log("Email sent:", info.response);
-            }
-          });
+          // transporter.sendMail(mailOptions, function (error, info) {
+          //   if (error) {
+          //     console.log("Error:", error);
+          //   } else {
+          //     console.log("Email sent:", info.response);
+          //   }
+          // });
           res.redirect("/login");
         });
     })
