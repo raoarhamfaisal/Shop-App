@@ -1,22 +1,17 @@
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/user");
+const crypto = require("crypto");
 
-// Import the Nodemailer library
-const nodemailer = require("nodemailer");
+const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend");
 
-// Create a transporter object
-const transporter = nodemailer.createTransport({
-  host: process.env.MAILERSEND_HOST,
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.MAILERSEND_USER,
-    pass: process.env.MAILERSEND_PASS,
-  },
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY,
 });
-
-// Send the email
+const sentFrom = new Sender(
+  "arhamfaisal@trial-pr9084zxj0jlw63d.mlsender.net",
+  "Arham Faisal"
+);
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash("error");
@@ -88,31 +83,32 @@ exports.postSignup = (req, res, next) => {
       return bcrypt
         .hash(password, 12)
         .then((hashedPassword) => {
-          const mailOptions = {
-            from: "arhamfaisal780@gmail.com",
-            to: email,
-            subject: "Successfully Signed Up",
-            text: "You are signed up to arhamfaisal",
-            html: "<h1>Successfully Signed Up</h1>",
-          };
+          const recipients = [new Recipient(email)];
 
-          return transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log("Error:", error);
-            } else {
-              console.log("Email sent:", info.response);
+          const emailParams = new EmailParams()
+            .setFrom(sentFrom)
+            .setTo(recipients)
+            .setReplyTo(sentFrom)
+            .setSubject("Sign up Successfully")
+            .setHtml("<h1>Signed up is successful!</h1>")
+            .setText("Signed up!");
+
+          return mailerSend.email
+            .send(emailParams)
+            .then((result) => {
+              console.log("Email sent", result);
               const user = new User({
                 email: email,
                 password: hashedPassword,
                 cart: { items: [] },
               });
               return user.save();
-            }
-          });
+            })
+            .catch((err) => {
+              console.log("Error", err);
+            });
         })
         .then((result) => {
-          // Configure the mailoptions object
-
           res.redirect("/login");
         });
     })
@@ -138,5 +134,56 @@ exports.getReset = (req, res, next) => {
     path: "/reset",
     pageTitle: "Reset Password",
     errorMessage: message,
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/reset");
+    }
+    const token = buffer.toString("hex");
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash("error", "No account with that email was found");
+          return res.redirect("/reset");
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 1000 * 60 * 60;
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect("/");
+        const recipients = [new Recipient(req.body.email)];
+        const personalization = [
+          {
+            email: req.body.email,
+            data: {
+              token: token,
+            },
+          },
+        ];
+        const emailParams = new EmailParams()
+          .setFrom(sentFrom)
+          .setTo(recipients)
+          .setReplyTo(sentFrom)
+          .setSubject("Password reset")
+          .setTemplateId("0r83ql3rrkplzw1j")
+          .setPersonalization(personalization);
+
+        return mailerSend.email
+          .send(emailParams)
+          .then((result) => {
+            console.log("Email sent for reset password", result);
+          })
+          .catch((err) => {
+            console.log("Error sending email", err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 };
