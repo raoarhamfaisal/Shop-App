@@ -147,70 +147,24 @@ exports.postSignup = (req, res, next) => {
     })
     .then((result) => {
       res.redirect("/login");
-      const recipients = [new Recipient(email)];
+      // const recipients = [new Recipient(email)];
 
-      const emailParams = new EmailParams()
-        .setFrom(sentFrom)
-        .setTo(recipients)
-        .setReplyTo(sentFrom)
-        .setSubject("Sign up Successfully")
-        .setHtml("<h1>Signed up is successful!</h1>")
-        .setText("Signed up!");
+      // const emailParams = new EmailParams()
+      //   .setFrom(sentFrom)
+      //   .setTo(recipients)
+      //   .setReplyTo(sentFrom)
+      //   .setSubject("Sign up Successfully")
+      //   .setHtml("<h1>Signed up is successful!</h1>")
+      //   .setText("Signed up!");
 
-      mailerSend.email.send(emailParams).then((result) => {
-        console.log("Email sent", result);
-      });
+      // mailerSend.email.send(emailParams).then((result) => {
+      //   console.log("Email sent", result);
+      // });
     })
     .catch((err) => {
       console.log(err);
     });
 };
-
-// exports.postSignup = (req, res, next) => {
-//   const email = req.body.email;
-//   const password = req.body.password;
-//   const result = validationResult(req);
-//   if (!result.isEmpty()) {
-//     console.log("error", result.array());
-//     return res.status(422).render("auth/signup", {
-//       path: "/signup",
-//       pageTitle: "Signup",
-//       errorMessage: result.array()[0].msg,
-//     });
-//   }
-
-//   return bcrypt
-//     .hash(password, 12)
-//     .then((hashedPassword) => {
-//       const recipients = [new Recipient(email)];
-
-//       const emailParams = new EmailParams()
-//         .setFrom(sentFrom)
-//         .setTo(recipients)
-//         .setReplyTo(sentFrom)
-//         .setSubject("Sign up Successfully")
-//         .setHtml("<h1>Signed up is successful!</h1>")
-//         .setText("Signed up!");
-
-//       return mailerSend.email
-//         .send(emailParams)
-//         .then((result) => {
-//           console.log("Email sent", result);
-//           const user = new User({
-//             email: email,
-//             password: hashedPassword,
-//             cart: { items: [] },
-//           });
-//           return user.save();
-//         })
-//         .catch((err) => {
-//           console.log("Error", err);
-//         });
-//     })
-//     .then((result) => {
-//       res.redirect("/login");
-//     });
-// };
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
@@ -251,31 +205,31 @@ exports.postReset = (req, res, next) => {
       })
       .then((result) => {
         res.redirect("/");
-        const recipients = [new Recipient(req.body.email)];
-        const personalization = [
-          {
-            email: req.body.email,
-            data: {
-              token: token,
-            },
-          },
-        ];
-        const emailParams = new EmailParams()
-          .setFrom(sentFrom)
-          .setTo(recipients)
-          .setReplyTo(sentFrom)
-          .setSubject("Password reset")
-          .setTemplateId("0r83ql3rrkplzw1j")
-          .setPersonalization(personalization);
+        // const recipients = [new Recipient(req.body.email)];
+        // const personalization = [
+        //   {
+        //     email: req.body.email,
+        //     data: {
+        //       token: token,
+        //     },
+        //   },
+        // ];
+        // const emailParams = new EmailParams()
+        //   .setFrom(sentFrom)
+        //   .setTo(recipients)
+        //   .setReplyTo(sentFrom)
+        //   .setSubject("Password reset")
+        //   .setTemplateId("0r83ql3rrkplzw1j")
+        //   .setPersonalization(personalization);
 
-        return mailerSend.email
-          .send(emailParams)
-          .then((result) => {
-            console.log("Email sent for reset password", result);
-          })
-          .catch((err) => {
-            console.log("Error sending email", err);
-          });
+        // return mailerSend.email
+        //   .send(emailParams)
+        //   .then((result) => {
+        //     console.log("Email sent for reset password", result);
+        //   })
+        //   .catch((err) => {
+        //     console.log("Error sending email", err);
+        //   });
       })
       .catch((err) => {
         console.log(err);
