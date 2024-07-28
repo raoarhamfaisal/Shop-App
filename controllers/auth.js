@@ -75,7 +75,6 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
   const result = validationResult(req);
   if (!result.isEmpty()) {
     console.log("error", result.array());
@@ -85,45 +84,37 @@ exports.postSignup = (req, res, next) => {
       errorMessage: result.array()[0].msg,
     });
   }
-  User.findOne({ email: email })
-    .then((userDoc) => {
-      if (userDoc) {
-        return res.redirect("/signup");
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          const recipients = [new Recipient(email)];
 
-          const emailParams = new EmailParams()
-            .setFrom(sentFrom)
-            .setTo(recipients)
-            .setReplyTo(sentFrom)
-            .setSubject("Sign up Successfully")
-            .setHtml("<h1>Signed up is successful!</h1>")
-            .setText("Signed up!");
+  return bcrypt
+    .hash(password, 12)
+    .then((hashedPassword) => {
+      const recipients = [new Recipient(email)];
 
-          return mailerSend.email
-            .send(emailParams)
-            .then((result) => {
-              console.log("Email sent", result);
-              const user = new User({
-                email: email,
-                password: hashedPassword,
-                cart: { items: [] },
-              });
-              return user.save();
-            })
-            .catch((err) => {
-              console.log("Error", err);
-            });
-        })
+      const emailParams = new EmailParams()
+        .setFrom(sentFrom)
+        .setTo(recipients)
+        .setReplyTo(sentFrom)
+        .setSubject("Sign up Successfully")
+        .setHtml("<h1>Signed up is successful!</h1>")
+        .setText("Signed up!");
+
+      return mailerSend.email
+        .send(emailParams)
         .then((result) => {
-          res.redirect("/login");
+          console.log("Email sent", result);
+          const user = new User({
+            email: email,
+            password: hashedPassword,
+            cart: { items: [] },
+          });
+          return user.save();
+        })
+        .catch((err) => {
+          console.log("Error", err);
         });
     })
-    .catch((err) => {
-      console.log(err);
+    .then((result) => {
+      res.redirect("/login");
     });
 };
 
