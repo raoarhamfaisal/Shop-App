@@ -20,16 +20,13 @@
     "connect-mongodb-session": "^5.0.0",
     "csurf": "^1.11.0",
     "ejs": "^2.6.1",
-    "express": "^4.16.3",
-    "express-handlebars": "^3.0.0",
+    "express": "^4.19.2",
     "express-session": "^1.18.0",
     "express-validator": "^7.1.0",
     "mailersend": "^2.2.0",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.9.14",
-    "nodemailer-sendgrid-transport": "^0.2.0",
-    "pug": "^2.0.3"
+    "nodemailer": "^6.9.14"
   }
 }
