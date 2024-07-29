@@ -21,14 +21,18 @@ const csrfProtection = csrf();
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
+    console.log("Saving file to images directory");
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + "-" + file.originalname);
+    const timestamp = new Date().toISOString().replace(/:/g, "-");
+    console.log("Processed filename:", timestamp + "-" + file.originalname);
+    cb(null, timestamp + "-" + file.originalname);
   },
 });
 
 const fileFilter = (req, file, cb) => {
+  console.log("Checking file type:", file.mimetype);
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
