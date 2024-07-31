@@ -55,7 +55,7 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: errors.array(),
     });
   }
-  const imageUrl = image.path;
+  const imageUrl = "/" + image.path;
 
   const product = new Product({
     title: title,
@@ -123,7 +123,6 @@ exports.postEditProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: updatedTitle,
-        imageUrl: updatedImageUrl,
         price: updatedPrice,
         description: updatedDesc,
         _id: prodId,
@@ -142,7 +141,7 @@ exports.postEditProduct = (req, res, next) => {
       product.price = updatedPrice;
       product.description = updatedDesc;
       if (image) {
-        product.imageUrl = image.path;
+        product.imageUrl = "/" + image.path;
       }
       return product.save().then((result) => {
         console.log("UPDATED PRODUCT!");
